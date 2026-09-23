@@ -1,0 +1,22 @@
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const page=document.body.dataset.page;
+const nav=`<nav class="nav"><a class="brand" href="index.html">R<span>♥</span> #Rachika</a><div class="navlinks">${[1,2,3,4,5,6,7].map((n,i)=>`<a href="${n===1?'index.html':`page${n}.html`}" class="${page==n?'active':''}">${n}</a>`).join('')}</div></nav>`;
+document.body.insertAdjacentHTML('afterbegin',nav);
+function heart(x=Math.random()*100,y=105){const e=document.createElement('div');e.className='heart';e.textContent=['❤️','💗','💜','💕','✨'][Math.floor(Math.random()*5)];e.style.left=x+'vw';e.style.top=y+'vh';e.style.fontSize=(14+Math.random()*24)+'px';e.style.setProperty('--drift',(Math.random()*140-70)+'px');e.style.animationDuration=(3+Math.random()*3)+'s';document.body.appendChild(e);setTimeout(()=>e.remove(),6500)}
+function hearts(n=12){for(let i=0;i<n;i++)setTimeout(()=>heart(),i*120)}
+function spark(x,y){const e=document.createElement('div');e.className='sparkle';e.textContent='✦';e.style.left=x+'px';e.style.top=y+'px';e.style.fontSize=(12+Math.random()*18)+'px';document.body.appendChild(e);setTimeout(()=>e.remove(),1900)}
+function petals(n=22){for(let i=0;i<n;i++){const e=document.createElement('div');e.className='petal';e.textContent=['🌸','🌷','🦋'][Math.floor(Math.random()*3)];e.style.left=Math.random()*100+'vw';e.style.fontSize=(12+Math.random()*18)+'px';e.style.animationDuration=(7+Math.random()*7)+'s';e.style.animationDelay=(Math.random()*7)+'s';e.style.setProperty('--x',(Math.random()*220-110)+'px');document.body.appendChild(e);setTimeout(()=>e.remove(),16000)}}
+if([3,4,5].includes(Number(page))) setInterval(()=>heart(Math.random()*100,105),700);
+if(Number(page)===4) petals(30);
+if(Number(page)===1) setTimeout(()=>hearts(18),800);
+if(Number(page)===3) setInterval(()=>hearts(3),1800);
+if(Number(page)===5) setInterval(()=>heart(Math.random()*100,105),900);
+// scratch cards
+function initScratch(){ $$('.scratch-wrap').forEach(w=>{const c=w.querySelector('canvas'),ctx=c.getContext('2d');let drawing=false,total=0,done=false;function size(){const r=w.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);ctx.fillStyle='rgba(50,30,65,.98)';ctx.fillRect(0,0,r.width,r.height);ctx.font='700 22px DM Sans';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText('SCRATCH ME ✨',r.width/2,r.height/2)}size();addEventListener('resize',size);function scratch(e){if(done)return;const r=c.getBoundingClientRect(),p=e.touches?e.touches[0]:e;ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(p.clientX-r.left,p.clientY-r.top,34,0,Math.PI*2);ctx.fill();total++;if(total%20===0){let data=ctx.getImageData(0,0,c.width,c.height).data,clear=0;for(let i=3;i<data.length;i+=4)if(data[i]<40)clear++;if(clear/data.length>.17){done=true;w.classList.add('scratch-done');ctx.clearRect(0,0,c.width,c.height);for(let i=0;i<14;i++)setTimeout(()=>heart(r.left/r.width*100,55),i*50)}}}c.addEventListener('pointerdown',e=>{drawing=true;scratch(e)});c.addEventListener('pointermove',e=>{if(drawing)scratch(e)});addEventListener('pointerup',()=>drawing=false)})}
+if(Number(page)===3) setTimeout(initScratch,100);
+// puzzle
+if(Number(page)===6){const p=$('.puzzle');if(p){let drag=null,selected=null;$$('.tile').forEach(t=>{t.addEventListener('dragstart',()=>{drag=t;t.classList.add('dragging')});t.addEventListener('dragend',()=>t.classList.remove('dragging'));t.addEventListener('dragover',e=>e.preventDefault());t.addEventListener('drop',e=>{e.preventDefault();if(drag&&drag!==t){const a=drag.innerHTML,b=t.innerHTML;drag.innerHTML=b;t.innerHTML=a;check()}});t.addEventListener('click',()=>{if(!selected){selected=t;t.classList.add('correct')}else if(selected===t){t.classList.remove('correct');selected=null}else{const a=selected.innerHTML,b=t.innerHTML;selected.innerHTML=b;t.innerHTML=a;selected.classList.remove('correct');selected=null;check()}})});function check(){const v=$$('.tile').map(t=>t.textContent.trim()).join('');if(v==='RACHIKA'){$$('.tile').forEach(t=>t.classList.add('correct'));$('.success')?.classList.add('show');hearts(30);}}}}
+// reveal chat
+$$('.reveal-btn').forEach(b=>b.addEventListener('click',()=>{const t=b.previousElementSibling;t.classList.add('show');b.remove();hearts(12)}));
+// scroll reveal
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('reveal')}),{threshold:.08});$$('.reveal-on-scroll').forEach(e=>obs.observe(e));
